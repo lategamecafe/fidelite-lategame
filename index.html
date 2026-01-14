@@ -16,42 +16,53 @@
 
     img {
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       display: block;
       margin: auto;
     }
 
     .container {
-      padding: 20px;
+      padding: 30px 20px 50px;
+    }
+
+    h1 {
+      margin-top: 10px;
+      font-size: 2em;
+    }
+
+    p {
+      opacity: 0.85;
     }
 
     input {
-      width: 80%;
-      max-width: 300px;
       padding: 12px;
       font-size: 16px;
       border-radius: 8px;
       border: none;
-      margin-top: 10px;
+      width: 220px;
+      margin-top: 15px;
     }
 
     button {
-      margin-top: 10px;
-      padding: 12px 20px;
+      margin-top: 15px;
+      padding: 12px 22px;
       font-size: 16px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
-      background-color: #ffb703;
       cursor: pointer;
+      background: #f5b400;
+      color: #000;
+      font-weight: bold;
     }
 
-    .result {
+    #result {
       margin-top: 20px;
-      font-size: 22px;
+      font-size: 18px;
     }
 
     .error {
-      color: #ff6b6b;
+      color: #ff4d4d;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -59,21 +70,21 @@
 <body>
 
   <!-- IMAGE DU JEU DE L’OIE -->
-  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Jeu de l'oie Late Game Café">
+  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité Late Game Café">
 
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
 
-    <input type="text" id="pseudo" placeholder="Ton pseudo">
+    <input id="pseudo" type="text" placeholder="Ton pseudo">
     <br>
     <button onclick="checkProgress()">Voir ma progression</button>
 
-    <div id="result" class="result"></div>
+    <div id="result"></div>
   </div>
 
   <script>
-    // URL DE TON API (NE PAS AJOUTER ?pseudo=)
+    // ⚠️ REMPLACE CETTE URL UNIQUEMENT SI TU CHANGES DE SCRIPT
     const API_URL = "https://script.google.com/macros/s/AKfycbzIBfgK8Cc3M2RBMJblGJQVjXFr6YGLCvRyvdYCSmS4pMs9fsUstHaSJzA4FR82rX-S/exec";
 
     function checkProgress() {
@@ -85,21 +96,29 @@
         return;
       }
 
-      fetch(API_URL + "?pseudo=" + encodeURIComponent(pseudo))
-        .then(response => response.text())
-        .then(data => {
-          if (data === "NOT_FOUND") {
-            result.innerHTML = "<span class='error'>Pseudo inconnu</span>";
-          } else {
-            result.innerHTML = `📍 Tu es à la case <strong>${data}</strong> / 15`;
-          }
-        })
-        .catch(() => {
-          result.innerHTML = "<span class='error'>Erreur de connexion</span>";
-        });
+      const callbackName = "cb_" + Math.random().toString(36).substring(2);
+
+      window[callbackName] = function (data) {
+        if (data === "NOT_FOUND") {
+          result.innerHTML = "<span class='error'>Pseudo inconnu</span>";
+        } else if (data === "ERROR") {
+          result.innerHTML = "<span class='error'>Erreur serveur</span>";
+        } else {
+          result.innerHTML = `📍 Tu es à la case <strong>${data}</strong> / 15`;
+        }
+        delete window[callbackName];
+      };
+
+      const script = document.createElement("script");
+      script.src = API_URL
+        + "?pseudo=" + encodeURIComponent(pseudo)
+        + "&callback=" + callbackName;
+
+      document.body.appendChild(script);
     }
   </script>
 
 </body>
 </html>
+
 
