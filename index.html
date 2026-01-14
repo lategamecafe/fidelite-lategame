@@ -2,11 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <title>Carte de fidélité – Late Game Café</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carte de fidélité</title>
 
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #111;
       color: #fff;
@@ -14,90 +15,127 @@
     }
 
     img {
-      max-width: 100%;
-      margin-bottom: 20px;
+      width: 100%;
+      max-width: 900px;
+      display: block;
+      margin: auto;
     }
 
-    input, button {
-      padding: 10px;
+    .container {
+      padding: 30px 20px;
+    }
+
+    input {
+      padding: 14px;
       font-size: 16px;
-      margin: 5px;
+      border-radius: 8px;
+      border: none;
+      width: 260px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 14px 26px;
+      font-size: 16px;
+      background: #f5b800;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
     }
 
     #plateau {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      display: flex;
+      justify-content: center;
       gap: 10px;
-      margin-top: 20px;
+      margin-top: 25px;
+      flex-wrap: wrap;
     }
 
     .case {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
       background: #333;
-      padding: 15px 0;
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      border: 2px solid #555;
+      position: relative;
     }
 
-    .case.active {
-      background: #4caf50;
-    }
-
-    .case.current {
-      background: #ff9800;
+    .active {
+      background: #f5b800;
       color: #000;
+    }
+
+    .current::after {
+      content: "🦉";
+      position: absolute;
+      top: -15px;
+      right: -10px;
+      font-size: 26px;
+    }
+
+    #resultat {
+      margin-top: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 🔴 TON IMAGE COMME AVANT -->
-  <img src="images/carte.png" alt="Carte fidélité">
+  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte fidélité">
 
-  <h1>Carte de fidélité</h1>
+  <div class="container">
+    <h1>🎲 Carte de fidélité</h1>
+    <p>Entre ton pseudo pour voir ta progression</p>
 
-  <input id="pseudo" type="text" placeholder="Pseudo">
+    <input id="pseudo" placeholder="Ton pseudo">
+    <br>
+    <button onclick="voirProgression()">Voir ma progression</button>
 
-  <!-- 🔴 BOUTON COMME AVANT -->
-  <button onclick="valider()">Valider</button>
-
-  <div id="plateau"></div>
+    <div id="resultat"></div>
+    <div id="plateau"></div>
+  </div>
 
   <script>
-    const SCRIPT_URL =
-      "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec";
-
-    const MAX_CASES = 15;
-
-    function valider() {
-      const pseudo = document.getElementById("pseudo").value;
+    function voirProgression() {
+      var pseudo = document.getElementById("pseudo").value.trim();
       if (!pseudo) return;
 
-      fetch(
-        SCRIPT_URL +
-        "?pseudo=" +
-        encodeURIComponent(pseudo) +
-        "&_=" + Date.now()
-      )
-        .then(r => r.json())
-        .then(data => {
-          afficherPlateau(data.progression);
-        });
-    }
+      window.test = function (progression) {
+        document.getElementById("resultat").innerHTML =
+          "🎯 Progression : " + progression + " / 15";
 
-    function afficherPlateau(progression) {
-      const plateau = document.getElementById("plateau");
-      plateau.innerHTML = "";
+        var plateau = document.getElementById("plateau");
+        plateau.innerHTML = "";
 
-      for (let i = 1; i <= MAX_CASES; i++) {
-        const c = document.createElement("div");
-        c.className = "case";
-        if (i <= progression) c.classList.add("active");
-        if (i === progression) c.classList.add("current");
-        c.textContent = i;
-        plateau.appendChild(c);
-      }
+        for (var i = 1; i <= 15; i++) {
+          var c = document.createElement("div");
+          c.className = "case";
+          if (i <= progression) c.classList.add("active");
+          if (i === progression) c.classList.add("current");
+          c.textContent = i;
+          plateau.appendChild(c);
+        }
+      };
+
+      var s = document.createElement("script");
+
+      // 🔴 REMPLACE PAR TON URL /exec
+      s.src =
+        "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec" +
+        "?pseudo=" + encodeURIComponent(pseudo) +
+        "&callback=test" +
+        "&_=" + Date.now();
+
+      document.body.appendChild(s);
     }
   </script>
 
 </body>
 </html>
+
