@@ -138,20 +138,27 @@
       }
     };
 
-    var s = document.createElement("script");
-    s.src =
-      "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec" +
-      "?pseudo=" + encodeURIComponent(pseudo) +
-      "&callback=test" +
-      "&_=" + Date.now();
+    // 🔥 Nettoyage ancien script (CRUCIAL POUR ANDROID)
+var old = document.getElementById("jsonp");
+if (old) old.remove();
 
-    document.body.appendChild(s);
-  }
+var s = document.createElement("script");
+s.id = "jsonp";
+s.src =
+  "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec" +
+  "?pseudo=" + encodeURIComponent(pseudo) +
+  "&callback=test" +
+  "&_=" + Date.now();
+  
+document.body.appendChild(s);
+}
+  
 </script>
 
 
 </body>
 </html>
+
 
 
 
