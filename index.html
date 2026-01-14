@@ -9,7 +9,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #111;
+      background: #111;
       color: #fff;
       text-align: center;
     }
@@ -31,7 +31,6 @@
       border-radius: 8px;
       border: none;
       width: 260px;
-      max-width: 90%;
     }
 
     button {
@@ -44,10 +43,6 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-    }
-
-    button:hover {
-      background: #ffd44d;
     }
 
     #resultat {
@@ -63,7 +58,6 @@
 
 <body>
 
-  <!-- IMAGE DU JEU DE L'OIE -->
   <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité">
 
   <div class="container">
@@ -72,13 +66,13 @@
 
     <input id="pseudo" placeholder="Ton pseudo">
     <br>
-    <button onclick="voirProgression()">Voir ma progression</button>
+    <button id="btn">Voir ma progression</button>
 
     <div id="resultat"></div>
   </div>
 
   <script>
-    function voirProgression() {
+    document.getElementById("btn").addEventListener("click", function () {
       const pseudo = document.getElementById("pseudo").value.trim();
       const resultat = document.getElementById("resultat");
 
@@ -87,31 +81,26 @@
         return;
       }
 
-      // Callback JSONP (obligatoirement global)
-      window.test = function(valeur) {
-        if (typeof valeur === "number") {
-          resultat.innerHTML =
-            "🎯 Progression : <strong>" + valeur + " / 15</strong>";
-        } else {
-          resultat.innerHTML =
-            "<span class='error'>Pseudo introuvable</span>";
-        }
+      // callback JSONP
+      window.test = function (valeur) {
+        resultat.innerHTML =
+          "🎯 Progression : <strong>" + valeur + " / 15</strong>";
       };
 
-      // 🔴 METS ICI TON URL GOOGLE SCRIPT /exec
       const SCRIPT_URL =
-        https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec
+        "https://script.google.com/macros/s/AKfycbYbfmPJDk78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXFQ/exec";
 
-      const script = document.createElement("script");
-      script.src =
+      const s = document.createElement("script");
+      s.src =
         SCRIPT_URL +
         "?pseudo=" + encodeURIComponent(pseudo) +
         "&callback=test" +
         "&_=" + Date.now();
 
-      document.body.appendChild(script);
-    }
+      document.body.appendChild(s);
+    });
   </script>
 
 </body>
 </html>
+
