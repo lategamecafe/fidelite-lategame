@@ -42,13 +42,7 @@
       color: #000;
       border: none;
       border-radius: 10px;
-      cursor: pointer;
       font-weight: bold;
-      touch-action: manipulation;
-    }
-
-    button:active {
-      transform: scale(0.98);
     }
 
     #resultat {
@@ -60,7 +54,6 @@
       color: #ff4d4d;
     }
 
-    /* Plateau */
     #plateau {
       display: flex;
       flex-wrap: wrap;
@@ -105,23 +98,35 @@
 
 <body>
 
-  <!-- Image du jeu de l’oie -->
   <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité">
 
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
 
-    <input id="pseudo" placeholder="Ton pseudo">
-    <br>
-    <button id="btn">Voir ma progression</button>
+    <!-- 🔑 FORMULAIRE NATIF -->
+    <form id="formPseudo">
+      <input
+        id="pseudo"
+        name="pseudo"
+        placeholder="Ton pseudo"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        required
+      >
+      <br>
+      <button type="submit">Voir ma progression</button>
+    </form>
 
     <div id="resultat"></div>
     <div id="plateau"></div>
   </div>
 
   <script>
-    function lancerProgression() {
+    document.getElementById("formPseudo").addEventListener("submit", function (e) {
+      e.preventDefault(); // empêche reload mobile
+
       const pseudo = document.getElementById("pseudo").value.trim();
       const resultat = document.getElementById("resultat");
       const plateau = document.getElementById("plateau");
@@ -133,7 +138,7 @@
         return;
       }
 
-      // Callback JSONP (global, compatible mobile)
+      // Callback JSONP GLOBAL (mobile-safe)
       window.test = function (progression) {
         if (typeof progression !== "number") {
           resultat.innerHTML =
@@ -160,7 +165,7 @@
         }
       };
 
-      // 🔴 REMPLACE CETTE URL PAR TON VRAI SCRIPT /exec
+      // 🔴 REMPLACE PAR TON URL /exec
       const SCRIPT_URL =
         "https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec";
 
@@ -172,21 +177,8 @@
         "&_=" + Date.now(); // anti-cache mobile
 
       document.body.appendChild(s);
-    }
-
-    // Gestion desktop + mobile
-    document.addEventListener("DOMContentLoaded", function () {
-      const btn = document.getElementById("btn");
-
-      btn.addEventListener("click", lancerProgression);
-      btn.addEventListener("touchend", function (e) {
-        e.preventDefault();
-        lancerProgression();
-      });
     });
   </script>
 
 </body>
 </html>
-
-
