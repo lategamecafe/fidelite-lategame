@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Carte de fidélité – Late Game Café</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     body {
@@ -15,14 +15,10 @@
     }
 
     img {
-  width: 100%;
-  max-width: 900px;
-  display: block;
-  margin: auto;
-  pointer-events: none;
-}
-
-
+      width: 100%;
+      max-width: 900px;
+      display: block;
+      margin: auto;
     }
 
     .container {
@@ -35,6 +31,7 @@
       border-radius: 8px;
       border: none;
       width: 260px;
+      max-width: 90%;
     }
 
     button {
@@ -46,6 +43,7 @@
       border: none;
       border-radius: 10px;
       font-weight: bold;
+      cursor: pointer;
     }
 
     #plateau {
@@ -85,81 +83,84 @@
     #resultat {
       margin-top: 20px;
       font-size: 18px;
+      min-height: 24px;
     }
   </style>
 </head>
 
 <body>
 
-  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte fidélité">
+  <!-- Image décorative -->
+  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte fidélité Late Game Café">
 
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
 
-    <input id="pseudo" placeholder="Ton pseudo">
-    <br>
-   <button id="btnVoir">Voir ma progression</button>
+    <input id="pseudo" placeholder="Ton pseudo" />
+    <br />
+    <button id="btnVoir">Voir ma progression</button>
 
     <div id="resultat"></div>
     <div id="plateau"></div>
   </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document
-      .getElementById("btnVoir")
-      .addEventListener("click", voirProgression);
-  });
+  <script>
+    // 🔗 REMPLACE PAR TA NOUVELLE URL /exec (SANS /u/0 /u/1 /u/2)
+    const GAS_URL =
+      "https://script.google.com/macros/s/AKfycbz_2wRXsIFZJ1g2SpygEHUvUj5NJFReaX5RzNH8_S1jS9Rj1k8jpRoZJlj-xT4Y1Q6_/exec";
 
-  function voirProgression() {
-    var pseudo = document.getElementById("pseudo").value.trim();
-    if (!pseudo) {
-      alert("Entre un pseudo");
-      return;
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+      document
+        .getElementById("btnVoir")
+        .addEventListener("click", voirProgression);
+    });
 
-    document.getElementById("resultat").innerHTML = "⏳ Chargement...";
-
-    window.test = function (progression) {
-      document.getElementById("resultat").innerHTML =
-        "🎯 Progression : " + progression + " / 15";
-
-      var plateau = document.getElementById("plateau");
-      plateau.innerHTML = "";
-
-      for (var i = 1; i <= 15; i++) {
-        var c = document.createElement("div");
-        c.className = "case";
-        if (i <= progression) c.classList.add("active");
-        if (i === progression) c.classList.add("current");
-        c.textContent = i;
-        plateau.appendChild(c);
+    function voirProgression() {
+      var pseudo = document.getElementById("pseudo").value.trim();
+      if (!pseudo) {
+        alert("Entre un pseudo");
+        return;
       }
-    };
 
-    // 🔥 Nettoyage ancien script (CRUCIAL POUR ANDROID)
-var old = document.getElementById("jsonp");
-if (old) old.remove();
+      document.getElementById("resultat").innerHTML = "⏳ Chargement...";
+      document.getElementById("plateau").innerHTML = "";
 
-var s = document.createElement("script");
-s.id = "jsonp";
-s.src =
-  "https://script.google.com/macros/s/AKfycbxOBjv_cGBjvhgTPK1QyvkSefeBUO2SkQziFl2eTH6Mkd5rmvNY2D42E6gkTPTKB0av/exec" +
-  "?pseudo=" + encodeURIComponent(pseudo) +
-  "&callback=test" +
-  "&_=" + Date.now();
-  
-document.body.appendChild(s);
-}
-  
-</script>
+      // Callback JSONP global
+      window.test = function (progression) {
+        document.getElementById("resultat").innerHTML =
+          "🎯 Progression : " + progression + " / 15";
 
+        var plateau = document.getElementById("plateau");
+        plateau.innerHTML = "";
+
+        for (var i = 1; i <= 15; i++) {
+          var c = document.createElement("div");
+          c.className = "case";
+          if (i <= progression) c.classList.add("active");
+          if (i === progression) c.classList.add("current");
+          c.textContent = i;
+          plateau.appendChild(c);
+        }
+      };
+
+      // 🔥 IMPORTANT ANDROID : supprimer l'ancien script JSONP
+      var old = document.getElementById("jsonp");
+      if (old) old.remove();
+
+      var s = document.createElement("script");
+      s.id = "jsonp";
+      s.src =
+        GAS_URL +
+        "?pseudo=" +
+        encodeURIComponent(pseudo) +
+        "&callback=test" +
+        "&_=" +
+        Date.now();
+
+      document.body.appendChild(s);
+    }
+  </script>
 
 </body>
 </html>
-
-
-
-
-
