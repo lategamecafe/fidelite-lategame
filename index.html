@@ -7,30 +7,66 @@
 
   <style>
     body {
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
-      background: #111;
+      background: #0f0f0f;
       color: #fff;
       text-align: center;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
       padding: 20px;
     }
 
-    input, button {
-      padding: 10px;
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto 20px;
+      pointer-events: none; /* IMPORTANT mobile */
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
       font-size: 16px;
-      margin: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: none;
+      background: #ff9800;
+      color: #000;
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
     }
 
     #plateau {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      gap: 8px;
       margin-top: 20px;
     }
 
     .case {
       background: #333;
-      border-radius: 8px;
-      padding: 20px 0;
+      padding: 16px 0;
+      border-radius: 6px;
       font-weight: bold;
     }
 
@@ -47,23 +83,90 @@
 
 <body>
 
-  <h1>Carte de fidélité</h1>
+  <div class="container">
 
-  <input
-    type="text"
-    id="pseudo"
-    placeholder="Pseudo"
-    autocomplete="off"
-  />
+    <!-- IMAGE (URL ABSOLUE) -->
+    <img src="https://i.imgur.com/XXXXX.png" alt="Carte fidélité">
 
-  <br>
+    <h1>Carte de fidélité</h1>
 
-  <button onclick="valider()">Valider</button>
+    <input
+      id="pseudo"
+      type="text"
+      placeholder="Entre ton pseudo"
+      autocomplete="off"
+    >
 
-  <div id="plateau"></div>
+    <button id="btnValider" type="button">
+      Valider
+    </button>
+
+    <div id="plateau"></div>
+
+  </div>
 
   <script>
+    /* ===============================
+       CONFIG
+    =============================== */
+
+    const SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec";
+
     const MAX_CASES = 15;
+
+    /* ===============================
+       INIT
+    =============================== */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("btnValider");
+
+      /* MOBILE */
+      btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        valider();
+      }, { passive: false });
+
+      /* DESKTOP */
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        valider();
+      });
+    });
+
+    /* ===============================
+       LOGIQUE
+    =============================== */
+
+    function valider() {
+      console.log("BOUTON CLIQUÉ");
+
+      const pseudo = document.getElementById("pseudo").value.trim();
+      if (!pseudo) {
+        alert("Merci d’entrer un pseudo");
+        return;
+      }
+
+      fetch(
+        SCRIPT_URL +
+        "?pseudo=" +
+        encodeURIComponent(pseudo) +
+        "&_=" + Date.now()
+      )
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+          afficherPlateau(data.progression);
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Erreur réseau");
+        });
+    }
 
     function afficherPlateau(progression) {
       const plateau = document.getElementById("plateau");
@@ -71,39 +174,14 @@
 
       for (let i = 1; i <= MAX_CASES; i++) {
         const div = document.createElement("div");
-        let classes = "case";
+        div.className = "case";
 
-        if (i <= progression) classes += " active";
-        if (i === progression) classes += " current";
+        if (i <= progression) div.classList.add("active");
+        if (i === progression) div.classList.add("current");
 
-        div.className = classes;
         div.textContent = i;
-
         plateau.appendChild(div);
       }
-    }
-
-    function valider() {
-      const pseudo = document.getElementById("pseudo").value.trim();
-
-      if (!pseudo) {
-        alert("Merci d’entrer un pseudo");
-        return;
-      }
-
-      google.script.run
-        .withSuccessHandler((res) => {
-          afficherPlateau(res.progression);
-          alert(
-            res.statut === "nouveau"
-              ? "Bienvenue ! Carte créée 🎉"
-              : "Progression mise à jour 👍"
-          );
-        })
-        .withFailureHandler((err) => {
-          alert("Erreur : " + err.message);
-        })
-        .enregistrerPseudo(pseudo);
     }
   </script>
 
