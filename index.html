@@ -93,6 +93,10 @@
       right: -10px;
       font-size: 26px;
     }
+
+    iframe {
+      display: none;
+    }
   </style>
 </head>
 
@@ -104,16 +108,13 @@
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
 
-    <!-- 🔑 FORMULAIRE NATIF -->
     <form id="formPseudo">
       <input
         id="pseudo"
-        name="pseudo"
         placeholder="Ton pseudo"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="none"
         required
+        autocapitalize="none"
+        autocorrect="off"
       >
       <br>
       <button type="submit">Voir ma progression</button>
@@ -121,28 +122,28 @@
 
     <div id="resultat"></div>
     <div id="plateau"></div>
+
+    <!-- iframe cachée pour Safari mobile -->
+    <iframe id="apiFrame"></iframe>
   </div>
 
   <script>
     document.getElementById("formPseudo").addEventListener("submit", function (e) {
-      e.preventDefault(); // empêche reload mobile
+      e.preventDefault();
 
       const pseudo = document.getElementById("pseudo").value.trim();
       const resultat = document.getElementById("resultat");
       const plateau = document.getElementById("plateau");
 
       if (!pseudo) {
-        resultat.innerHTML =
-          "<span class='error'>Pseudo manquant</span>";
-        plateau.innerHTML = "";
+        resultat.innerHTML = "<span class='error'>Pseudo manquant</span>";
         return;
       }
 
-      // Callback JSONP GLOBAL (mobile-safe)
+      // Callback GLOBAL (iframe-safe sur iOS)
       window.test = function (progression) {
         if (typeof progression !== "number") {
-          resultat.innerHTML =
-            "<span class='error'>Pseudo introuvable</span>";
+          resultat.innerHTML = "<span class='error'>Pseudo introuvable</span>";
           plateau.innerHTML = "";
           return;
         }
@@ -154,29 +155,24 @@
 
         for (let i = 1; i <= 15; i++) {
           const div = document.createElement("div");
-
           let classes = "case";
           if (i <= progression) classes += " active";
           if (i === progression) classes += " current";
-
           div.className = classes;
           div.textContent = i;
           plateau.appendChild(div);
         }
       };
 
-      // 🔴 REMPLACE PAR TON URL /exec
+      // 🔴 TON URL /exec (OBLIGATOIREMENT LA BONNE)
       const SCRIPT_URL =
         "https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec";
 
-      const s = document.createElement("script");
-      s.src =
+      document.getElementById("apiFrame").src =
         SCRIPT_URL +
         "?pseudo=" + encodeURIComponent(pseudo) +
         "&callback=test" +
-        "&_=" + Date.now(); // anti-cache mobile
-
-      document.body.appendChild(s);
+        "&_=" + Date.now();
     });
   </script>
 
