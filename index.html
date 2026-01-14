@@ -31,6 +31,7 @@
       border-radius: 8px;
       border: none;
       width: 260px;
+      max-width: 90%;
     }
 
     button {
@@ -45,19 +46,52 @@
       font-weight: bold;
     }
 
+    button:hover {
+      background: #ffd44d;
+    }
+
     #resultat {
-      margin-top: 25px;
+      margin-top: 20px;
       font-size: 20px;
     }
 
     .error {
       color: #ff4d4d;
     }
+
+    /* Plateau */
+    #plateau {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .case {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #aaa;
+      border: 2px solid #555;
+    }
+
+    .case.active {
+      background: #f5b800;
+      color: #000;
+      border-color: #ffd44d;
+    }
   </style>
 </head>
 
 <body>
 
+  <!-- Image du jeu de l’oie -->
   <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité">
 
   <div class="container">
@@ -69,26 +103,47 @@
     <button id="btn">Voir ma progression</button>
 
     <div id="resultat"></div>
+    <div id="plateau"></div>
   </div>
 
   <script>
     document.getElementById("btn").addEventListener("click", function () {
       const pseudo = document.getElementById("pseudo").value.trim();
       const resultat = document.getElementById("resultat");
+      const plateau = document.getElementById("plateau");
 
       if (!pseudo) {
-        resultat.innerHTML = "<span class='error'>Pseudo manquant</span>";
+        resultat.innerHTML =
+          "<span class='error'>Pseudo manquant</span>";
+        plateau.innerHTML = "";
         return;
       }
 
-      // callback JSONP
-      window.test = function (valeur) {
+      // Callback JSONP (DOIT être global)
+      window.test = function (progression) {
+        if (typeof progression !== "number") {
+          resultat.innerHTML =
+            "<span class='error'>Pseudo introuvable</span>";
+          plateau.innerHTML = "";
+          return;
+        }
+
         resultat.innerHTML =
-          "🎯 Progression : <strong>" + valeur + " / 15</strong>";
+          "🎯 Progression : <strong>" + progression + " / 15</strong>";
+
+        plateau.innerHTML = "";
+
+        for (let i = 1; i <= 15; i++) {
+          const div = document.createElement("div");
+          div.className = "case" + (i <= progression ? " active" : "");
+          div.textContent = i;
+          plateau.appendChild(div);
+        }
       };
 
+      // 🔴 REMPLACE ICI PAR TON URL /exec GOOGLE SCRIPT
       const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec";
+       "https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec";
 
       const s = document.createElement("script");
       s.src =
@@ -103,5 +158,3 @@
 
 </body>
 </html>
-
-
