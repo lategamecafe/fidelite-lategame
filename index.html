@@ -2,182 +2,110 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Carte de fidélité – Late Game Café</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte de fidélité</title>
 
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #111;
       color: #fff;
       text-align: center;
+      padding: 20px;
     }
 
-    img {
-      width: 100%;
-      max-width: 900px;
-      display: block;
-      margin: auto;
-    }
-
-    .container {
-      padding: 30px 20px;
-    }
-
-    input {
-      padding: 14px;
+    input, button {
+      padding: 10px;
       font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      width: 260px;
-      max-width: 90%;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 14px 26px;
-      font-size: 16px;
-      background: #f5b800;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
-    #resultat {
-      margin-top: 20px;
-      font-size: 20px;
-    }
-
-    .error {
-      color: #ff4d4d;
+      margin: 8px;
     }
 
     #plateau {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
     .case {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
       background: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 8px;
+      padding: 20px 0;
       font-weight: bold;
-      color: #aaa;
-      border: 2px solid #555;
-      position: relative;
     }
 
     .case.active {
-      background: #f5b800;
-      color: #000;
-      border-color: #ffd44d;
+      background: #4caf50;
     }
 
     .case.current {
-      box-shadow: 0 0 15px #ffd44d;
-    }
-
-    .case.current::after {
-      content: "🦉";
-      position: absolute;
-      top: -14px;
-      right: -10px;
-      font-size: 26px;
-    }
-
-    iframe {
-      display: none;
+      background: #ff9800;
+      color: #000;
     }
   </style>
 </head>
 
 <body>
 
-  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité">
+  <h1>Carte de fidélité</h1>
 
-  <div class="container">
-    <h1>🎲 Carte de fidélité</h1>
-    <p>Entre ton pseudo pour voir ta progression</p>
+  <input
+    type="text"
+    id="pseudo"
+    placeholder="Pseudo"
+    autocomplete="off"
+  />
 
-    <form id="formPseudo">
-      <input
-        id="pseudo"
-        placeholder="Ton pseudo"
-        required
-        autocapitalize="none"
-        autocorrect="off"
-      >
-      <br>
-      <button type="submit">Voir ma progression</button>
-    </form>
+  <br>
 
-    <div id="resultat"></div>
-    <div id="plateau"></div>
+  <button onclick="valider()">Valider</button>
 
-    <!-- iframe cachée pour Safari mobile -->
-    <iframe id="apiFrame"></iframe>
-  </div>
+  <div id="plateau"></div>
 
   <script>
-    document.getElementById("formPseudo").addEventListener("submit", function (e) {
-      e.preventDefault();
+    const MAX_CASES = 15;
 
-      const pseudo = document.getElementById("pseudo").value.trim();
-      const resultat = document.getElementById("resultat");
+    function afficherPlateau(progression) {
       const plateau = document.getElementById("plateau");
+      plateau.innerHTML = "";
+
+      for (let i = 1; i <= MAX_CASES; i++) {
+        const div = document.createElement("div");
+        let classes = "case";
+
+        if (i <= progression) classes += " active";
+        if (i === progression) classes += " current";
+
+        div.className = classes;
+        div.textContent = i;
+
+        plateau.appendChild(div);
+      }
+    }
+
+    function valider() {
+      const pseudo = document.getElementById("pseudo").value.trim();
 
       if (!pseudo) {
-        resultat.innerHTML = "<span class='error'>Pseudo manquant</span>";
+        alert("Merci d’entrer un pseudo");
         return;
       }
 
-      // Callback GLOBAL (iframe-safe sur iOS)
-      window.test = function (progression) {
-        if (typeof progression !== "number") {
-          resultat.innerHTML = "<span class='error'>Pseudo introuvable</span>";
-          plateau.innerHTML = "";
-          return;
-        }
-
-        resultat.innerHTML =
-          "🎯 Progression : <strong>" + progression + " / 15</strong>";
-
-        plateau.innerHTML = "";
-
-        for (let i = 1; i <= 15; i++) {
-          const div = document.createElement("div");
-          let classes = "case";
-          if (i <= progression) classes += " active";
-          if (i === progression) classes += " current";
-          div.className = classes;
-          div.textContent = i;
-          plateau.appendChild(div);
-        }
-      };
-
-      // 🔴 TON URL /exec (OBLIGATOIREMENT LA BONNE)
-      const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbzUdon_YGWc4QMY46V-3q2AO8PRJ_wRjsDWXlIHlekuKWQ1-328wYllCWJVqpWrIIB2/exec";
-
-      document.getElementById("apiFrame").src =
-        SCRIPT_URL +
-        "?pseudo=" + encodeURIComponent(pseudo) +
-        "&callback=test" +
-        "&_=" + Date.now();
-    });
+      google.script.run
+        .withSuccessHandler((res) => {
+          afficherPlateau(res.progression);
+          alert(
+            res.statut === "nouveau"
+              ? "Bienvenue ! Carte créée 🎉"
+              : "Progression mise à jour 👍"
+          );
+        })
+        .withFailureHandler((err) => {
+          alert("Erreur : " + err.message);
+        })
+        .enregistrerPseudo(pseudo);
+    }
   </script>
 
 </body>
 </html>
-
-
-
