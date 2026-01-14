@@ -11,7 +11,7 @@
       padding: 0;
       font-family: Arial, sans-serif;
       background: #0f0f0f;
-      color: #fff;
+      color: #ffffff;
       text-align: center;
     }
 
@@ -26,20 +26,19 @@
       height: auto;
       display: block;
       margin: 0 auto 20px;
-      pointer-events: none; /* IMPORTANT mobile */
     }
 
     h1 {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     input {
       width: 100%;
       padding: 12px;
       font-size: 16px;
-      margin-bottom: 10px;
       border-radius: 6px;
       border: none;
+      margin-bottom: 10px;
     }
 
     button {
@@ -49,11 +48,9 @@
       font-weight: bold;
       border-radius: 6px;
       border: none;
-      background: #ff9800;
+      background: #c98a1a;
       color: #000;
       cursor: pointer;
-      position: relative;
-      z-index: 10;
     }
 
     #plateau {
@@ -85,63 +82,36 @@
 
   <div class="container">
 
-    <!-- IMAGE (URL ABSOLUE) -->
-    <img src="https://i.imgur.com/XXXXX.png" alt="Carte fidélité">
+    <!-- 🔴 METS ICI TON IMAGE EXACTE (URL GITHUB) -->
+    <img
+      src="https://lategamecafe.github.io/fidelite-lategame/images/carte.png"
+      alt="Carte de fidélité"
+    >
 
     <h1>Carte de fidélité</h1>
 
     <input
       id="pseudo"
       type="text"
-      placeholder="Entre ton pseudo"
+      placeholder="Pseudo"
       autocomplete="off"
     >
 
-    <button id="btnValider" type="button">
-      Valider
-    </button>
+    <!-- BOUTON COMME AVANT -->
+    <button onclick="valider()">Valider</button>
 
     <div id="plateau"></div>
 
   </div>
 
   <script>
-    /* ===============================
-       CONFIG
-    =============================== */
-
+    /* URL DE TA WEB APP APPS SCRIPT */
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbzn821fwSAXzXx16l0gREPogCZsCVlFX4m6OSfvmO5AjWLLKYlyizYU1m_Sxi3GKmCF/exec";
 
     const MAX_CASES = 15;
 
-    /* ===============================
-       INIT
-    =============================== */
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("btnValider");
-
-      /* MOBILE */
-      btn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        valider();
-      }, { passive: false });
-
-      /* DESKTOP */
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        valider();
-      });
-    });
-
-    /* ===============================
-       LOGIQUE
-    =============================== */
-
     function valider() {
-      console.log("BOUTON CLIQUÉ");
-
       const pseudo = document.getElementById("pseudo").value.trim();
       if (!pseudo) {
         alert("Merci d’entrer un pseudo");
@@ -154,7 +124,7 @@
         encodeURIComponent(pseudo) +
         "&_=" + Date.now()
       )
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
           if (data.error) {
             alert(data.error);
@@ -164,7 +134,7 @@
         })
         .catch(err => {
           console.error(err);
-          alert("Erreur réseau");
+          alert("Erreur");
         });
     }
 
