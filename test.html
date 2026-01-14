@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Carte de fidélité – Late Game Café</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      text-align: center;
+    }
+
+    img {
+      width: 100%;
+      max-width: 800px;
+      display: block;
+      margin: auto;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    input {
+      width: 80%;
+      max-width: 300px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #ffb703;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+    }
+
+    .error {
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- IMAGE DU JEU DE L’OIE -->
+  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Jeu de l'oie Late Game Café">
+
+  <div class="container">
+    <h1>🎲 Carte de fidélité</h1>
+    <p>Entre ton pseudo pour voir ta progression</p>
+
+    <input type="text" id="pseudo" placeholder="Ton pseudo">
+    <br>
+    <button onclick="checkProgress()">Voir ma progression</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    // URL DE TON API (NE PAS AJOUTER ?pseudo=)
+    const API_URL = "https://script.google.com/macros/s/AKfycbzIBfgK8Cc3M2RBMJblGJQVjXFr6YGLCvRyvdYCSmS4pMs9fsUstHaSJzA4FR82rX-S/exec";
+
+    function checkProgress() {
+      const pseudo = document.getElementById("pseudo").value.trim();
+      const result = document.getElementById("result");
+
+      if (!pseudo) {
+        result.innerHTML = "<span class='error'>Entre un pseudo</span>";
+        return;
+      }
+
+      fetch(API_URL + "?pseudo=" + encodeURIComponent(pseudo))
+        .then(response => response.text())
+        .then(data => {
+          if (data === "NOT_FOUND") {
+            result.innerHTML = "<span class='error'>Pseudo inconnu</span>";
+          } else {
+            result.innerHTML = `📍 Tu es à la case <strong>${data}</strong> / 15`;
+          }
+        })
+        .catch(() => {
+          result.innerHTML = "<span class='error'>Erreur de connexion</span>";
+        });
+    }
+  </script>
+
+</body>
+</html>
+
