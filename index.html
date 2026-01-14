@@ -22,16 +22,7 @@
     }
 
     .container {
-      padding: 30px 20px 50px;
-    }
-
-    h1 {
-      margin-top: 10px;
-      font-size: 2em;
-    }
-
-    p {
-      opacity: 0.85;
+      padding: 30px 20px;
     }
 
     input {
@@ -39,80 +30,84 @@
       font-size: 16px;
       border-radius: 8px;
       border: none;
-      width: 220px;
-      margin-top: 15px;
+      width: 260px;
+      max-width: 90%;
     }
 
     button {
       margin-top: 15px;
-      padding: 12px 22px;
+      padding: 12px 25px;
       font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      background: #f5b400;
+      background: #f5b800;
       color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
       font-weight: bold;
     }
 
-    #result {
-      margin-top: 20px;
-      font-size: 18px;
+    button:hover {
+      background: #ffd44d;
+    }
+
+    #resultat {
+      margin-top: 25px;
+      font-size: 20px;
     }
 
     .error {
       color: #ff4d4d;
-      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- IMAGE DU JEU DE L’OIE -->
-  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité Late Game Café">
+  <!-- IMAGE DU JEU DE L'OIE -->
+  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte de fidélité">
 
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
 
-    <input id="pseudo" type="text" placeholder="Ton pseudo">
+    <input id="pseudo" placeholder="Ton pseudo">
     <br>
-    <button onclick="checkProgress()">Voir ma progression</button>
+    <button onclick="voirProgression()">Voir ma progression</button>
 
-    <div id="result"></div>
+    <div id="resultat"></div>
   </div>
 
   <script>
-    // ⚠️ REMPLACE CETTE URL UNIQUEMENT SI TU CHANGES DE SCRIPT
-    const API_URL = "https://script.google.com/macros/s/AKfycbzIBfgK8Cc3M2RBMJblGJQVjXFr6YGLCvRyvdYCSmS4pMs9fsUstHaSJzA4FR82rX-S/exec";
-
-    function checkProgress() {
+    function voirProgression() {
       const pseudo = document.getElementById("pseudo").value.trim();
-      const result = document.getElementById("result");
+      const resultat = document.getElementById("resultat");
 
       if (!pseudo) {
-        result.innerHTML = "<span class='error'>Entre un pseudo</span>";
+        resultat.innerHTML = "<span class='error'>Pseudo manquant</span>";
         return;
       }
 
-      const callbackName = "cb_" + Math.random().toString(36).substring(2);
-
-      window[callbackName] = function (data) {
-        if (data === "NOT_FOUND") {
-          result.innerHTML = "<span class='error'>Pseudo inconnu</span>";
-        } else if (data === "ERROR") {
-          result.innerHTML = "<span class='error'>Erreur serveur</span>";
+      // Callback JSONP (obligatoirement global)
+      window.test = function(valeur) {
+        if (typeof valeur === "number") {
+          resultat.innerHTML =
+            "🎯 Progression : <strong>" + valeur + " / 15</strong>";
         } else {
-          result.innerHTML = `📍 Tu es à la case <strong>${data}</strong> / 15`;
+          resultat.innerHTML =
+            "<span class='error'>Pseudo introuvable</span>";
         }
-        delete window[callbackName];
       };
 
+      // 🔴 https://script.google.com/macros/s/AKfycbyFbfmPJDK78jnTyzyNfZPibu98RdCoGJmyd9wyw6o1pKU-Dhh58jGZeTiyKOyvfXfQ/exec
+      const SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbXXXXXXXXXXXXXXX/exec";
+
       const script = document.createElement("script");
-      script.src = API_URL
-        + "?pseudo=" + encodeURIComponent(pseudo)
-        + "&callback=" + callbackName;
+      script.src =
+        SCRIPT_URL +
+        "?pseudo=" + encodeURIComponent(pseudo) +
+        "&callback=test" +
+        "&_=" + Date.now();
 
       document.body.appendChild(script);
     }
@@ -120,5 +115,3 @@
 
 </body>
 </html>
-
-
