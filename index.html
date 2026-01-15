@@ -52,11 +52,12 @@
 
     #pion {
       position: absolute;
-      font-size: 65px;
+      font-size: 45px; /* chouette +25% */
       transform: translate(-50%, -50%);
       z-index: 10;
       pointer-events: none;
       display: none;
+      transition: top 0.4s ease, left 0.4s ease;
     }
 
     #resultat {
@@ -69,7 +70,7 @@
 
 <body>
 
-  <!-- Plateau avec superposition -->
+  <!-- PLATEAU -->
   <div id="plateau-container">
     <img
       id="plateau-image"
@@ -79,6 +80,7 @@
     <div id="pion">🦉</div>
   </div>
 
+  <!-- UI -->
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
     <p>Entre ton pseudo pour voir ta progression</p>
@@ -91,20 +93,62 @@
   </div>
 
   <script>
-    // 🔗 URL DE TON APPS SCRIPT (OK)
+    // 🔗 URL APPS SCRIPT (NE PAS METTRE /u/0 /u/1 /u/2)
     const GAS_URL =
       "https://script.google.com/macros/s/AKfycbz_2wRXsIFZJ1g2SpygEHUvUj5NJFReaX5RzNH8_S1jS9Rj1k8jpRoZJlj-xT4Y1Q6_/exec";
+
+    // 📍 POSITIONS DES CASES (en %)
+    const CASES = [
+      // Case 1 (VALIDÉE)
+      { x: 48, y: 89 },
+
+      // Case 2
+      { x: 42, y: 86 },
+
+      // Case 3
+      { x: 36, y: 83 },
+
+      // Case 4
+      { x: 30, y: 80 },
+
+      // Case 5
+      { x: 24, y: 77 },
+
+      // Case 6
+      { x: 30, y: 72 },
+
+      // Case 7
+      { x: 36, y: 68 },
+
+      // Case 8
+      { x: 42, y: 64 },
+
+      // Case 9
+      { x: 48, y: 60 },
+
+      // Case 10
+      { x: 54, y: 56 },
+
+      // Case 11
+      { x: 60, y: 52 },
+
+      // Case 12
+      { x: 66, y: 48 },
+
+      // Case 13
+      { x: 72, y: 44 },
+
+      // Case 14
+      { x: 78, y: 40 },
+
+      // Case 15 (ARRIVÉE)
+      { x: 82, y: 36 }
+    ];
 
     document.addEventListener("DOMContentLoaded", function () {
       document
         .getElementById("btnVoir")
         .addEventListener("click", voirProgression);
-
-      // 🧪 POSITION DE TEST DE LA CHOUETTE (À AJUSTER)
-      const pion = document.getElementById("pion");
-      pion.style.left = "48%";
-      pion.style.top = "89%";
-      pion.style.display = "block";
     });
 
     function voirProgression() {
@@ -116,16 +160,27 @@
 
       document.getElementById("resultat").innerHTML = "⏳ Chargement...";
 
-      // Callback JSONP global
+      // Callback JSONP
       window.test = function (progression) {
         document.getElementById("resultat").innerHTML =
           "🎯 Progression : " + progression + " / 15";
 
-        // Pour l'instant on NE BOUGE PAS la chouette ici
-        // On validera le déplacement après le test visuel
+        const pion = document.getElementById("pion");
+
+        if (progression <= 0) {
+          pion.style.display = "none";
+          return;
+        }
+
+        const index = Math.min(progression - 1, CASES.length - 1);
+        const pos = CASES[index];
+
+        pion.style.display = "block";
+        pion.style.left = pos.x + "%";
+        pion.style.top = pos.y + "%";
       };
 
-      // Nettoyage script JSONP (important mobile)
+      // Nettoyage JSONP (important mobile)
       var old = document.getElementById("jsonp");
       if (old) old.remove();
 
@@ -145,6 +200,3 @@
 
 </body>
 </html>
-
-
-
