@@ -14,13 +14,6 @@
       text-align: center;
     }
 
-    img {
-      width: 100%;
-      max-width: 900px;
-      display: block;
-      margin: auto;
-    }
-
     .container {
       padding: 30px 20px;
     }
@@ -46,38 +39,24 @@
       cursor: pointer;
     }
 
-    #plateau {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-
-    .case {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      border: 2px solid #555;
+    #plateau-container {
       position: relative;
+      max-width: 900px;
+      margin: 20px auto;
     }
 
-    .active {
-      background: #f5b800;
-      color: #000;
+    #plateau-image {
+      width: 100%;
+      display: block;
     }
 
-    .current::after {
-      content: "🦉";
+    #pion {
       position: absolute;
-      top: -15px;
-      right: -10px;
-      font-size: 26px;
+      font-size: 36px;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      pointer-events: none;
+      display: none;
     }
 
     #resultat {
@@ -90,8 +69,15 @@
 
 <body>
 
-  <!-- Image décorative -->
-  <img src="https://i.imgur.com/AUChK1Z.jpeg" alt="Carte fidélité Late Game Café">
+  <!-- Plateau avec superposition -->
+  <div id="plateau-container">
+    <img
+      id="plateau-image"
+      src="https://i.imgur.com/AUChK1Z.jpeg"
+      alt="Plateau Late Game Café"
+    />
+    <div id="pion">🦉</div>
+  </div>
 
   <div class="container">
     <h1>🎲 Carte de fidélité</h1>
@@ -102,11 +88,10 @@
     <button id="btnVoir">Voir ma progression</button>
 
     <div id="resultat"></div>
-    <div id="plateau"></div>
   </div>
 
   <script>
-    // 🔗 REMPLACE PAR TA NOUVELLE URL /exec (SANS /u/0 /u/1 /u/2)
+    // 🔗 URL DE TON APPS SCRIPT (OK)
     const GAS_URL =
       "https://script.google.com/macros/s/AKfycbz_2wRXsIFZJ1g2SpygEHUvUj5NJFReaX5RzNH8_S1jS9Rj1k8jpRoZJlj-xT4Y1Q6_/exec";
 
@@ -114,6 +99,12 @@
       document
         .getElementById("btnVoir")
         .addEventListener("click", voirProgression);
+
+      // 🧪 POSITION DE TEST DE LA CHOUETTE (À AJUSTER)
+      const pion = document.getElementById("pion");
+      pion.style.left = "72%";
+      pion.style.top = "26%";
+      pion.style.display = "block";
     });
 
     function voirProgression() {
@@ -124,27 +115,17 @@
       }
 
       document.getElementById("resultat").innerHTML = "⏳ Chargement...";
-      document.getElementById("plateau").innerHTML = "";
 
       // Callback JSONP global
       window.test = function (progression) {
         document.getElementById("resultat").innerHTML =
           "🎯 Progression : " + progression + " / 15";
 
-        var plateau = document.getElementById("plateau");
-        plateau.innerHTML = "";
-
-        for (var i = 1; i <= 15; i++) {
-          var c = document.createElement("div");
-          c.className = "case";
-          if (i <= progression) c.classList.add("active");
-          if (i === progression) c.classList.add("current");
-          c.textContent = i;
-          plateau.appendChild(c);
-        }
+        // Pour l'instant on NE BOUGE PAS la chouette ici
+        // On validera le déplacement après le test visuel
       };
 
-      // 🔥 IMPORTANT ANDROID : supprimer l'ancien script JSONP
+      // Nettoyage script JSONP (important mobile)
       var old = document.getElementById("jsonp");
       if (old) old.remove();
 
